@@ -8,7 +8,7 @@ análisis, gráficos ni conclusiones.
 | Experimento | Notebook | Qué mide |
 |---|---|---|
 | **E1** HHL sobre una LS-SVM pequeña | `notebooks/01_hhl_lssvm.ipynb` | Recursos del circuito HHL (profundidad, `cx`, qubits) y fidelidad frente a la solución clásica |
-| **E2** QSVC vs SVC clásica | `notebooks/02_qsvc_vs_svc.ipynb` (**pendiente**) | Exactitud balanceada con el protocolo de Kakavand, más ajuste de escala `s` |
+| **E2** QSVC vs SVC clásica | `notebooks/02_qsvc_vs_svc.ipynb` | Exactitud balanceada con el protocolo de Kakavand, más ajuste de escala `s` |
 
 La especificación completa (decisiones fijadas, formulación, métricas, barridos, qué no
 hacer) está en **`CLAUDE.md`**. Léelo antes de tocar el código.
@@ -48,43 +48,56 @@ Puntos a tener en cuenta al analizar (hallazgos de la verificación, no conclusi
 - La profundidad simulada **no** es evidencia de aceleración: `e^{iFt}` se construye
   clásicamente y las rotaciones condicionadas son exponenciales en `n_c`.
 
-### E2 — `02_qsvc_vs_svc.ipynb`: no iniciado
-Falta todo. Es el trabajo para Vicente; ver la sección siguiente.
+### E2 — `02_qsvc_vs_svc.ipynb`: implementado y probado
+Hecho:
+- Datasets `breast_cancer`, `banknote` (submuestra estratificada de 300) y `haberman` con
+  `DatasetRegistry` de Kakavand; preprocesamiento `build_preprocessor` (standard + PCA) ajustado
+  solo con el entrenamiento de cada pliegue externo.
+- Kernels cuánticos `zzfm` / `rot2dof` (reps = 2, `compute_statevector_kernel` de Kakavand) y
+  clásicos `rbf` / `linear`. Ruido opcional (`NOISE = True`) con
+  `compute_noisy_density_matrix_kernel` (kernels `zzfm_noisy` / `rot2dof_noisy`).
+- CV anidada propia 5 × 3 (no se usa `run_nested_cv` de Kakavand), modos `kakavand` (`s = 1`) y
+  `scale_tuned` (búsqueda conjunta en `(C, s)`). Cada matriz se calcula una vez por pliegue y por
+  `s`; las cuánticas se cachean en disco (`results/qsvc/kernel_cache/`, clave `xxhash`).
+- Checkpoint por unidad `(dataset, semilla, pliegue, kernel)` en `runs.csv`, `RESUME`, `N_JOBS`
+  (joblib), `config.json` (config, versiones, commit), `subsample_indices.json` y `run.log`.
+- 5 pruebas con `assert` (todas pasan).
+
+Verificado:
+- Config rápida (`QUICK = True`, semilla 0: 120 filas) y barrido completo (`QUICK = False`)
+  ejecutados de punta a punta con `nbconvert`, sin errores. Tiempos en Linux, `N_JOBS = 1`:
+  rápida ~2,5 min; completa ~10 min (600 filas, con las matrices de la semilla 0 ya en caché).
+- `RESUME = True` sobre una carpeta terminada: 0 unidades pendientes, `runs.csv` intacto.
+- `NOISE = True` con `N_JOBS = 2` (Linux).
+
+Puntos a tener en cuenta al analizar (hallazgos de la verificación, no conclusiones):
+- **El ajuste de `s` no es de Kakavand.** Es una extensión propia motivada por Shaydulin & Wild
+  (2022) y Flórez et al. (2025); Kakavand solo lo propone como trabajo futuro (Sec. 7).
+- En modo `kakavand` el bucle propio reproduce **exactamente** (mismo `C` y misma exactitud
+  balanceada en cada pliegue) el runner leakage-free de Kakavand para los kernels cuánticos y el
+  lineal (prueba 5 con `zzfm`; además se comprobó aparte con `zzfm`, `rot2dof` y `linear` en
+  `breast_cancer` y `haberman`, semilla 0).
+- **RBF:** `γ = 'scale'` se calcula con el entrenamiento del pliegue a escala 1, así que `s`
+  equivale a multiplicar `γ` por `s²`. El `RBFKernel` de Kakavand recalcula `γ` con el primer
+  argumento (en `K(X_test, X_train)` usa la varianza del test); por eso el smoke test da 0,9384 aquí
+  y 0,9450 con su runner. Con su `γ`, el bucle propio da exactamente 0,9450 (prueba 2).
+- **Lineal:** `s` no se aplica (solo reescalaría `C`); en ambos modos usa `s = 1` y las filas de
+  `kakavand` y `scale_tuned` son idénticas.
+- **Desempate en la CV interna:** gana el primer `(C, s)` con la mejor media, en el orden `s = 1`
+  primero y luego el resto de `s_grid`, con `C` ascendente (igual que Kakavand para `C`).
+- **Qiskit ML:** `qiskit-machine-learning` 0.8.2 no se puede importar con `qiskit` 2.3
+  (`cannot import name 'Sampler' from 'qiskit.primitives'`), así que la prueba de equivalencia con
+  `FidelityQuantumKernel` / `QSVC` se **omite**. En su lugar se verifica el kernel contra el
+  circuito compute–uncompute `U†(x')U(x)` en statevector (`max |ΔK| ≈ 1e-15`).
+- `n_kernel_evals` cuenta entradas de Gram (`n_train(n_train+1)/2 + n_test·n_train` por cada `s`
+  usado), que es el número de circuitos de fidelidad que se necesitarían en hardware.
+  `kernel_time_s` es el tiempo de cálculo original, aunque la matriz venga del caché
+  (`kernel_cache_hit`).
+- El ruido de Kakavand aplica depolarizante 1q también a `rz` (a diferencia de E1); su kernel con
+  ruido es `Tr[ρ(x)ρ(x')]`, cuya diagonal es la pureza (≠ 1).
 
 ### Documentación
 - `README.md` (este archivo) y `CLAUDE.md` están al día con la estructura de notebooks.
-
----
-
-## Para quien continúe con E2
-
-Todo lo necesario está en las secciones 2, 6 y 8 de `CLAUDE.md`. Resumen de lo esencial:
-
-- **Datasets:** `breast_cancer`, `banknote` (submuestra estratificada de 300) y `haberman`.
-  Cargar con `qsvm_benchmark.datasets.DatasetRegistry.get(name)` (Kakavand). `banknote` y
-  `haberman` se descargan de UCI/OpenML la primera vez (requiere internet).
-- **Kernels:** cuánticos `zzfm` y `rot2dof` (reps = 2, `compute_statevector_kernel` de
-  Kakavand); clásicos `rbf` (γ = 'scale') y `linear`.
-- **Protocolo:** CV anidada 5 externos × 3 internos, estratificada, C ∈ {0.01, …, 100},
-  preprocesamiento ajustado solo con el entrenamiento de cada pliegue externo
-  (`build_preprocessor` de Kakavand), semillas 0–4, métrica: exactitud balanceada.
-- **Dos modos:** `kakavand` (`s = 1` fijo) y `scale_tuned` (búsqueda conjunta en `(C, s)`,
-  `s` ∈ {0.1, 0.25, 0.5, 1.0, 2.0}). **El ajuste de `s` no es de Kakavand**: atribuirlo a
-  Shaydulin & Wild / Flórez.
-- **No usar `run_nested_cv` de Kakavand** (calcula el kernel con preprocesamiento global y
-  solo ajusta C). Escribir el bucle propio tomando como referencia `run_nested_cv_leakage_free`.
-- **No modificar** `third_party/QSVM-Benchmark-Paper`; importarlo.
-- **Salida:** `results/qsvc/<timestamp>/runs.csv` con una fila por
-  `(dataset, kernel, mode, seed, outer_fold)` y las columnas listadas en `CLAUDE.md` §6.5,
-  más `config.json` y los índices de submuestreo.
-- **Pruebas** (celdas con `assert`, §6.6): sin fuga en el preprocesamiento; RBF con `s = 1`
-  reproduce ≈ 0.945 de exactitud balanceada en `breast_cancer` (PCA k = 4, CV 2×2); kernels
-  simétricos, diagonal 1 y semidefinidos positivos; equivalencia con `FidelityQuantumKernel`
-  / `QSVC` de Qiskit ML (marcar como omitida y documentar si hay incompatibilidad).
-- **Estructura de E1 como plantilla:** el notebook 01 ya resuelve semillas, versiones,
-  logging, checkpoint por corrida y `RESUME`; conviene copiar ese esquema (§1–2 del notebook).
-
----
 
 ## Entorno
 
@@ -102,7 +115,14 @@ third_party/QSVM-Benchmark-Paper/QSVM-Benchmark-Paper/pyproject.toml
 ```
 
 (es decir, `src/`, `tests/`, `pyproject.toml`, etc. dentro de esa carpeta interna). Solo hace
-falta para E2; E1 no lo usa.
+falta para E2; E1 no lo usa. El zip de Zenodo ya trae esa carpeta interna:
+
+```bash
+mkdir -p third_party/QSVM-Benchmark-Paper
+curl -L -o /tmp/QSVM-Benchmark-Paper.zip \
+  https://zenodo.org/api/records/19197916/files/QSVM-Benchmark-Paper.zip/content
+unzip /tmp/QSVM-Benchmark-Paper.zip -d third_party/QSVM-Benchmark-Paper
+```
 
 Instalación desde cero (PowerShell, en la raíz del proyecto):
 
@@ -111,6 +131,15 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m pip install -e third_party/QSVM-Benchmark-Paper/QSVM-Benchmark-Paper --no-deps
 .\.venv\Scripts\python.exe -m ipykernel install --user --name qml-exp --display-name "Python 3.12 (qml-exp)"
+```
+
+En Linux (si el sistema no trae Python 3.12, `uv` lo descarga):
+
+```bash
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python -r requirements.txt
+uv pip install --python .venv/bin/python --no-deps -e third_party/QSVM-Benchmark-Paper/QSVM-Benchmark-Paper
+.venv/bin/python -m ipykernel install --user --name qml-exp --display-name "Python 3.12 (qml-exp)"
 ```
 
 ## Cómo ejecutar
@@ -122,9 +151,17 @@ py -3.12 -m venv .venv
 Abrir un notebook con el kernel `qml-exp` y ejecutar todas las celdas. En la primera celda
 de configuración:
 
-- `QUICK = True` → corrida rápida (E1: 1 corrida, segundos). `QUICK = False` → barrido completo.
-- `RESUME = True` + `OUTPUT_DIR = "results/hhl/<carpeta>"` → retoma saltando lo ya guardado.
-- `NOISE = True` → agrega la simulación con ruido (solo N = 3).
+- `QUICK = True` → corrida rápida (E1: 1 corrida, segundos; E2: semilla 0, 120 filas, ~3 min).
+  `QUICK = False` → barrido completo (E2: semillas 0–4, 600 filas).
+- `RESUME = True` + `OUTPUT_DIR = "results/<hhl|qsvc>/<carpeta>"` → retoma saltando lo ya guardado.
+- `NOISE = True` → agrega la simulación con ruido (E1: solo N = 3; E2: kernels `*_noisy`).
+- `N_JOBS` (E2) → procesos de joblib; por defecto 1 (en Windows las funciones definidas en
+  celdas pueden fallar al serializarse).
+
+E2 guarda en `results/qsvc/<timestamp>/`: `runs.csv` (una fila por
+`(dataset, kernel, mode, seed, outer_fold)`), `config.json`, `subsample_indices.json` y `run.log`.
+Las matrices kernel cuánticas quedan en `results/qsvc/kernel_cache/` y se reutilizan entre
+corridas (borrar la carpeta para forzar el recálculo).
 
 Para corridas largas sin abrir la interfaz:
 
@@ -143,10 +180,10 @@ Experimentos/
 ├── README.md                  # este archivo
 ├── requirements.txt
 ├── .venv/                     # Python 3.12 (no versionar)
-├── third_party/QSVM-Benchmark-Paper/QSVM-Benchmark-Paper/   # Kakavand, sin modificar (no versionado; colocar a mano)
+├── third_party/QSVM-Benchmark-Paper/QSVM-Benchmark-Paper/   # Kakavand, sin modificar (no versionado; descargar de Zenodo)
 ├── notebooks/
 │   ├── 01_hhl_lssvm.ipynb     # E1 (listo)
-│   └── 02_qsvc_vs_svc.ipynb   # E2 (pendiente)
+│   └── 02_qsvc_vs_svc.ipynb   # E2 (listo)
 └── results/                   # salida; no versionar
 ```
 
