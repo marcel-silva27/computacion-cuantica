@@ -1,0 +1,10 @@
+﻿.venv/
+results/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+*.egg-info/
+
+# Codigo de Kakavand: no se versiona (CC BY 4.0). Ver README, seccion Entorno.
+third_party/

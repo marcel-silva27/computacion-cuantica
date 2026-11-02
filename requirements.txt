@@ -1,0 +1,34 @@
+# Versiones fijadas tomadas del requirements.txt de Kakavand (QSVM-Benchmark-Paper).
+# Python 3.12 (Kakavand exige >=3.10,<3.13).
+#
+# Core
+numpy==2.4.1
+scipy==1.17.0
+pandas==2.3.3
+scikit-learn==1.7.2
+pyyaml==6.0.3
+pydantic==2.12.5
+xxhash==3.6.0
+tqdm>=4.65.0
+joblib==1.5.3
+
+# Quantum (qiskit-ibm-runtime no se necesita: todo es simulacion)
+qiskit==2.3.0
+qiskit-aer==0.17.2
+qiskit-machine-learning==0.8.2
+
+# Data
+ucimlrepo==0.0.7
+
+# Dependencias que el paquete de Kakavand importa al cargarse (plots); no se usan para figuras propias
+matplotlib==3.10.8
+seaborn==0.13.2
+
+# Notebooks
+jupyter
+ipykernel==6.31.0
+nbconvert
+nbformat
+
+# Tests
+pytest==8.4.2
