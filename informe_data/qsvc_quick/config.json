@@ -1,0 +1,115 @@
+{
+  "config": {
+    "datasets": {
+      "breast_cancer": {
+        "scaler": "standard",
+        "reducer": "pca",
+        "k": 4,
+        "subsample": null
+      },
+      "banknote": {
+        "scaler": "standard",
+        "reducer": "pca",
+        "k": 4,
+        "subsample": 300
+      },
+      "haberman": {
+        "scaler": "standard",
+        "reducer": "pca",
+        "k": 3,
+        "subsample": null
+      }
+    },
+    "quantum_kernels": [
+      "zzfm",
+      "rot2dof"
+    ],
+    "classical_kernels": [
+      "rbf",
+      "linear"
+    ],
+    "reps": 2,
+    "modes": [
+      "kakavand",
+      "scale_tuned"
+    ],
+    "C_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "s_grid": [
+      0.1,
+      0.25,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "n_outer": 5,
+    "n_inner": 3,
+    "seeds": [
+      0
+    ],
+    "subsample_seed": null,
+    "noise": {
+      "p1": 0.001,
+      "p2": 0.01,
+      "shots": 1024
+    },
+    "kernel_cache_dir": "results/qsvc/kernel_cache",
+    "quick": true,
+    "noise_enabled": false,
+    "n_jobs": 1
+  },
+  "versions": {
+    "numpy": "2.4.1",
+    "scipy": "1.17.0",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.7.2",
+    "qiskit": "2.3.0",
+    "qiskit-aer": "0.17.2",
+    "qiskit-machine-learning": "0.8.2",
+    "qsvm-benchmark": "0.1.0",
+    "ucimlrepo": "0.0.7"
+  },
+  "python": "3.12.10",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "git_commit": "7af8f7e261dbd4c5dae64f156e572930afc8a84c",
+  "date": "2026-11-03T09:42:37",
+  "datasets": {
+    "breast_cancer": {
+      "n_samples_raw": 569,
+      "n_features_raw": 30,
+      "source": "sklearn.datasets",
+      "class_counts": [
+        212,
+        357
+      ]
+    },
+    "banknote": {
+      "n_samples_raw": 1372,
+      "n_features_raw": 4,
+      "source": "UCI",
+      "class_counts": [
+        762,
+        610
+      ]
+    },
+    "haberman": {
+      "n_samples_raw": 306,
+      "n_features_raw": 3,
+      "source": "UCI",
+      "class_counts": [
+        225,
+        81
+      ]
+    }
+  },
+  "notes": {
+    "scale_s": "El ajuste de s (modo scale_tuned) es una extensi\u00f3n propia motivada por Shaydulin & Wild 2022 y Fl\u00f3rez et al. 2025; no es parte del protocolo de Kakavand.",
+    "linear_s": "El kernel lineal usa siempre s=1 (s solo reescalar\u00eda C).",
+    "rbf_gamma": "gamma='scale' calculado con el entrenamiento del pliegue a escala 1."
+  }
+}

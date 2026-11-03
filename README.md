@@ -9,6 +9,7 @@ análisis, gráficos ni conclusiones.
 |---|---|---|
 | **E1** HHL sobre una LS-SVM pequeña | `notebooks/01_hhl_lssvm.ipynb` | Recursos del circuito HHL (profundidad, `cx`, qubits) y fidelidad frente a la solución clásica |
 | **E2** QSVC vs SVC clásica | `notebooks/02_qsvc_vs_svc.ipynb` | Exactitud balanceada con el protocolo de Kakavand, más ajuste de escala `s` |
+| **Informe** | `notebooks/03_informe.ipynb` | Explica el código, los experimentos y sus bases; incluye resultados **de prueba** (no definitivos) |
 
 La especificación completa (decisiones fijadas, formulación, métricas, barridos, qué no
 hacer) está en **`CLAUDE.md`**. Léelo antes de tocar el código.
@@ -186,7 +187,9 @@ Experimentos/
 ├── third_party/QSVM-Benchmark-Paper/QSVM-Benchmark-Paper/   # Kakavand, sin modificar (no versionado; descargar de Zenodo)
 ├── notebooks/
 │   ├── 01_hhl_lssvm.ipynb     # E1 (listo)
-│   └── 02_qsvc_vs_svc.ipynb   # E2 (listo)
+│   ├── 02_qsvc_vs_svc.ipynb   # E2 (listo)
+│   └── 03_informe.ipynb       # informe (se guarda con las salidas ejecutadas)
+├── informe_data/              # resultados de prueba que lee el informe (sí versionados)
 └── results/                   # salida; no versionar
 ```
 

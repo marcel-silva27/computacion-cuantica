@@ -65,7 +65,8 @@ Experimentos/
 │                                 # (instalado con pip install -e --no-deps)
 ├── notebooks/
 │   ├── 01_hhl_lssvm.ipynb        # E1: utilidades, LS-SVM, HHL, recursos, pruebas, barrido
-│   └── 02_qsvc_vs_svc.ipynb      # E2: datos, kernels, CV anidada (C, s), pruebas, barrido
+│   ├── 02_qsvc_vs_svc.ipynb      # E2: datos, kernels, CV anidada (C, s), pruebas, barrido
+│   └── 03_informe.ipynb          # informe: explica código, experimentos y bases; resultados de prueba
 └── results/                      # salida; no versionar
 ```
 
@@ -270,7 +271,9 @@ Requisitos de los notebooks (variables en la celda de configuración):
 - No modificar `third_party/QSVM-Benchmark-Paper`.
 - No atribuir a Kakavand el ajuste de la escala `s`.
 - No agregar datasets, mapas de características ni hardware real sin consultar.
-- No generar figuras, tablas resumen ni conclusiones en esta etapa.
+- No generar figuras, tablas resumen ni conclusiones en los notebooks 01 y 02. Excepción:
+  el informe (notebook 03, ver §10) puede mostrar tablas y figuras de **resultados de
+  prueba**, sin interpretación estadística ni conclusiones.
 - No presentar la profundidad del HHL simulado como evidencia de aceleración: el
   operador `e^{iFt}` se construye clásicamente. Dejarlo dicho en el README.
 
@@ -291,3 +294,23 @@ Requisitos de los notebooks (variables en la celda de configuración):
   *PRA* 106, 042407.
 - Havlíček et al. (2019). Supervised learning with quantum-enhanced feature spaces.
   *Nature* 567, 209–212.
+
+---
+
+## 10. Informe (notebook 03)
+
+Decisión del usuario: no hay formato de entrega fijado. El informe es un notebook
+(`notebooks/03_informe.ipynb`) que **explica el código, los experimentos y en qué se basan**,
+y muestra algunos resultados de prueba solo para evidenciar el funcionamiento.
+
+- Solo **lee** `runs.csv` y `config.json` de las carpetas fijadas en su primera celda
+  (`HHL_RESULTS`, `QSVC_RESULTS`); no vuelve a ejecutar los experimentos. Por defecto apuntan a
+  `informe_data/hhl_demo/` (E1, grilla reducida de 16 corridas) e `informe_data/qsvc_quick/` (E2,
+  config rápida, 120 filas): copias pequeñas de resultados de prueba **sí versionadas**, porque
+  `results/` no se versiona. Para usar otra corrida, cambiar esas dos rutas.
+- Los extractos de código se toman de los notebooks 01 y 02 con una función auxiliar (no se
+  copian a mano), para que no se desfasen.
+- Los resultados son de corridas rápidas/reducidas, y el informe lo dice explícitamente.
+  Sin pruebas estadísticas ni conclusiones sobre las hipótesis hasta tener los barridos completos.
+- El ajuste de `s` se atribuye a Shaydulin & Wild / Flórez, no a Kakavand.
+- Se guarda **con las salidas ejecutadas** para que se vea sin volver a correr nada.
