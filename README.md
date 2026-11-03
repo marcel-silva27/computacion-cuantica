@@ -26,11 +26,14 @@ Hecho:
 - Ruido opcional (Aer, matriz de densidad, solo N = 3).
 - Checkpoint por corrida en `runs.csv`, `config.json` y `run.log`.
 - 4 pruebas con `assert` (todas pasan), ejecutando el notebook con la config rápida.
+- `RESUME = True` verificado en una grilla de 4 combinaciones (N ∈ {3, 7} × `exact`/`trotter`,
+  `n_c = 4`): se interrumpió con `KeyboardInterrupt` tras 2 corridas (2 filas guardadas), al
+  retomar solo se ejecutaron las 2 pendientes (4 filas, sin duplicados) y una segunda
+  reanudación sobre la carpeta completa no ejecutó nada.
 
 Sin ejecutar o sin verificar:
 - **El barrido completo** (`QUICK = False`: 144 corridas). Estimación: 30–60 min; la corrida
   más pesada (N = 7, `n_c = 6`, `trotter`) tardó ~66 s en una prueba suelta.
-- **`RESUME = True`**: escrito, no probado.
 - **N = 15** (16×16): opcional, no probado.
 - **Ruido**: probado en una sola corrida (N = 3, `n_c = 4`).
 
