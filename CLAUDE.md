@@ -292,6 +292,8 @@ Requisitos de los notebooks (variables en la celda de configuración):
   10.5281/zenodo.19197916.
 - Shaydulin, Wild (2022). Importance of kernel bandwidth in quantum machine learning.
   *PRA* 106, 042407.
+- Flórez Ablan, Roth, Schnabel (2025). On the similarity of bandwidth-tuned quantum kernels
+  and classical kernels. arXiv:2503.05602.
 - Havlíček et al. (2019). Supervised learning with quantum-enhanced feature spaces.
   *Nature* 567, 209–212.
 
