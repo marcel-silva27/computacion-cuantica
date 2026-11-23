@@ -4,16 +4,23 @@
       3
     ],
     "n_c": [
+      3,
+      4,
+      5,
       6
     ],
     "gamma": [
+      0.1,
+      1,
       10
     ],
     "mode": [
       "exact"
     ],
     "seeds": [
-      0
+      0,
+      1,
+      2
     ],
     "kernel": "linear",
     "trotter_order": 2,
@@ -37,5 +44,5 @@
     "qiskit-machine-learning": "0.8.2"
   },
   "python": "3.12.10",
-  "date": "2026-11-23T18:48:42"
+  "date": "2026-11-23T18:56:37"
 }

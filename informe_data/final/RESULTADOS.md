@@ -161,9 +161,19 @@ Datos: `e1_ext_nc78/`; tablas `e1_ext*`; figura 5 (barrido original + extensión
   27 492 cx / 60 659 (11 y 12 qubits). Cada qubit de reloj extra multiplica los `cx` por ≈ 2.5 (rotaciones multicontroladas, exponenciales en n_c).
   Misma advertencia: estos conteos no son evidencia de aceleración.
 
-**Prueba de ruido (una sola corrida, `e1_noise_test/`)**: N = 3, n_c = 6, γ = 10, `exact`, semilla 0, Aer con matriz de densidad y depolarizante
-1q = 0.001 (en `sx`), 2q = 0.01 (en `cx`). Fidelidad 0.993 sin ruido → **0.194 con ruido**; `success_prob` 0.0718 → 0.0078. Tiempo de la corrida: 9.6 s.
-No es un barrido (n = 1); el barrido con ruido de N = 3 completo sigue sin ejecutar.
+## E1 con ruido (barrido adicional posterior; N = 3, modo `exact`, 36 corridas)
+
+N = 3 × n_c ∈ {3, 4, 5, 6} × γ ∈ {0.1, 1, 10} × 3 semillas, con `NOISE = True`: Aer, matriz de densidad, depolarizante 1q = 0.001 (en `sx`) y
+2q = 0.01 (en `cx`). Datos: `e1_noise_exact/`; tabla `e1_ruido*`. 36 filas, 0 fallos, cómputo ≈ 86 s (máx 8.8 s por corrida). La fidelidad sin ruido
+coincide con la del barrido original (verificado con assert). **El modo `trotter` con ruido no se ejecutó.**
+
+- **Fidelidad con ruido: 0.067–0.195 en las 36 corridas; ninguna ≥ 0.9**, para todos los γ. Rango por n_c (mín–máx): n_c = 3: 0.067–0.080; 4: 0.113–0.119;
+  5: 0.159–0.174; 6: 0.181–0.195. Es decir, con ruido crece con n_c pero queda en torno a 0.07–0.2, casi independiente de γ y de la semilla (1/dim_F = 0.25 es la
+  fidelidad de un estado maximamente mezclado de 2 qubits con cualquier estado puro).
+- Mediana de (fidelidad con ruido − sin ruido): +0.07 (n_c = 3), +0.09 (4), −0.25 (5), −0.52 (6). Con n_c ≤ 4 la fidelidad sin ruido ya era ≈ 0.01–0.03, así que
+  el ruido no la empeora (sube algo).
+- Caso de n_c = 6, γ = 10 (el único del barrido original con fidelidad ≥ 0.9): 0.994 sin ruido → 0.194 con ruido; `success_prob` 0.079 → 0.0078 (medianas).
+- Un solo modelo de ruido, sin repetir con otras tasas; sin mitigación de errores. La tasa 2q = 0.01 aplicada a 477–3727 `cx` es un ruido grande para estos circuitos.
 
 ## Anomalías y desviaciones respecto de lo esperado
 1. **Rendimiento ≈ azar:** zzfm con `s = 1` en breast_cancer da 49.50 % (balanced accuracy); rot2dof en haberman da exactamente 50.00 % en 25/25
@@ -177,5 +187,5 @@ No es un barrido (n = 1); el barrido con ruido de N = 3 completo sigue sin ejecu
 5. `config.json` de **E1 no incluye commit** (el de E2 sí: `984cec6`, con el árbol de trabajo modificado: notebooks 01 y 02 tenían cambios sin commitear —salidas
    ejecutadas— al momento de correr). E1 no genera `subsample_indices.json`: los índices de entrenamiento van en la columna `train_idx` de `runs.csv`.
 6. E1: la prueba 3 de `CLAUDE.md` se verifica con γ = 10 (ver README); en el barrido completo γ = 10 es la única combinación que supera 0.9, solo para N = 3.
-7. E1 con ruido: solo se ejecutó una corrida de prueba (ver arriba), no el barrido de N = 3 (opcional). N = 15 no se ejecutó (opcional).
+7. E1 con ruido: se ejecutó solo en modo `exact` (N = 3); `trotter` con ruido no. N = 15 no se ejecutó (opcional).
 8. `qiskit-machine-learning` 0.8.2 sigue sin ser compatible con `qiskit` 2.3: la prueba de equivalencia con `QSVC` se omite (ver README).
