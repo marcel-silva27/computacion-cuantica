@@ -2,14 +2,17 @@
 
 Código para dos experimentos propuestos en el informe de estado del arte del curso de
 computación cuántica. Todo es simulación (statevector / Aer), sin hardware IBM.
-Esta etapa solo entrega código que corre y deja **resultados crudos** (CSV/JSON): no hay
-análisis, gráficos ni conclusiones.
+Los barridos **completos** de E1 (144 corridas) y E2 (600 filas) ya se ejecutaron y analizados:
+los resultados crudos, tablas, figuras y un resumen de hechos están en **`informe_data/final/`**
+(ver sección *Resultados finales*). El análisis describe lo que muestran los datos; no saca
+conclusiones sobre "ventaja cuántica".
 
 | Experimento | Notebook | Qué mide |
 |---|---|---|
 | **E1** HHL sobre una LS-SVM pequeña | `notebooks/01_hhl_lssvm.ipynb` | Recursos del circuito HHL (profundidad, `cx`, qubits) y fidelidad frente a la solución clásica |
 | **E2** QSVC vs SVC clásica | `notebooks/02_qsvc_vs_svc.ipynb` | Exactitud balanceada con el protocolo de Kakavand, más ajuste de escala `s` |
-| **Informe** | `notebooks/03_informe.ipynb` | Explica el código, los experimentos y sus bases; incluye resultados **de prueba** (no definitivos) |
+| **Informe** | `notebooks/03_informe.ipynb` | Explica el código, los experimentos y sus bases; muestra resultados de las corridas rápidas/reducidas de `informe_data/hhl_demo` y `qsvc_quick` (no los barridos finales) |
+| **Análisis** | `notebooks/04_analisis.ipynb` | Lee `informe_data/final/e1` y `e2` y genera `tables/` y `figs/` |
 
 La especificación completa (decisiones fijadas, formulación, métricas, barridos, qué no
 hacer) está en **`CLAUDE.md`**. Léelo antes de tocar el código.
@@ -18,7 +21,7 @@ hacer) está en **`CLAUDE.md`**. Léelo antes de tocar el código.
 
 ## Estado actual
 
-### E1 — `01_hhl_lssvm.ipynb`: implementado y probado, barrido completo sin ejecutar
+### E1 — `01_hhl_lssvm.ipynb`: implementado, probado y barrido completo ejecutado
 Hecho:
 - LS-SVM (kernel lineal o RBF, relleno a potencia de 2), solución clásica y clasificación.
 - Circuito HHL a mano: QPE con reloj en complemento a dos, rotaciones multicontroladas,
@@ -33,7 +36,7 @@ Hecho:
   reanudación sobre la carpeta completa no ejecutó nada.
 
 Sin ejecutar o sin verificar:
-- **El barrido completo** (`QUICK = False`: 144 corridas). Estimación: 30–60 min; la corrida
+- ~~El barrido completo~~ (ejecutado: 144 corridas en 23 min 37 s, ver *Resultados finales*). La corrida
   más pesada (N = 7, `n_c = 6`, `trotter`) tardó ~66 s en una prueba suelta.
 - **N = 15** (16×16): opcional, no probado.
 - **Ruido**: probado en una sola corrida (N = 3, `n_c = 4`).
@@ -100,8 +103,30 @@ Puntos a tener en cuenta al analizar (hallazgos de la verificación, no conclusi
 - El ruido de Kakavand aplica depolarizante 1q también a `rz` (a diferencia de E1); su kernel con
   ruido es `Tr[ρ(x)ρ(x')]`, cuya diagonal es la pureza (≠ 1).
 
+### Resultados finales (`informe_data/final/`)
+Barridos completos ejecutados el 2026-11-23 en Windows 11 (`QUICK = False`, `NOISE = False`, `N_JOBS = 1`):
+E1 144 filas en 23 min 37 s; E2 600 filas en 53 min 18 s (corrieron en paralelo, así que los tiempos
+medidos pueden estar inflados). Sin fallos, duplicados ni NaN.
+
+```
+informe_data/final/
+├── RESULTADOS.md   # números clave, anomalías y desviaciones (solo hechos)
+├── e1/             # runs.csv, config.json
+├── e2/             # runs.csv, config.json, subsample_indices.json (sin kernel_cache)
+├── tables/         # CSV y .tex (solo tabular con \hline, sin caption)
+└── figs/           # fig1..fig4 en PDF y PNG (300 dpi)
+```
+
+`notebooks/04_analisis.ipynb` regenera `tables/` y `figs/` a partir de `e1/` y `e2/` (sin recalcular los
+experimentos). **Lea `RESULTADOS.md`** antes de citar cifras: incluye las advertencias sobre p-valores optimistas
+(los pliegues comparten datos), el RBF de Kakavand que recalcula `gamma` con el primer argumento, que el ajuste
+de `s` es extensión propia (Shaydulin & Wild 2022; Flórez et al. 2025) y que la profundidad del HHL simulado
+no es evidencia de aceleración (`e^{iFt}` se construye clásicamente). Para repetir los barridos: `QUICK = False`,
+`RESUME = True` y un `OUTPUT_DIR` fijo en cada notebook (E2 tarda ~1 h sin caché de kernels).
+
 ### Documentación
-- `README.md` (este archivo) y `CLAUDE.md` están al día con la estructura de notebooks.
+- `README.md` (este archivo) y `CLAUDE.md` están al día con la estructura de notebooks. Nota: la regla de
+  `CLAUDE.md` "sin análisis ni figuras en esta etapa" quedó reemplazada por el notebook 04 y `informe_data/final/`.
 
 ## Entorno
 
@@ -188,8 +213,11 @@ Experimentos/
 ├── notebooks/
 │   ├── 01_hhl_lssvm.ipynb     # E1 (listo)
 │   ├── 02_qsvc_vs_svc.ipynb   # E2 (listo)
-│   └── 03_informe.ipynb       # informe (se guarda con las salidas ejecutadas)
-├── informe_data/              # resultados de prueba que lee el informe (sí versionados)
+│   ├── 03_informe.ipynb       # informe (se guarda con las salidas ejecutadas)
+│   └── 04_analisis.ipynb      # tablas y figuras de los barridos completos
+├── informe_data/              # sí versionado
+│   ├── hhl_demo/, qsvc_quick/ # resultados de prueba que lee el informe (03)
+│   └── final/                 # barridos completos + tablas + figuras + RESULTADOS.md
 └── results/                   # salida; no versionar
 ```
 
