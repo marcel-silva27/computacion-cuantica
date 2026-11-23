@@ -1,0 +1,47 @@
+{
+  "config": {
+    "N": [
+      3,
+      7
+    ],
+    "n_c": [
+      7,
+      8
+    ],
+    "gamma": [
+      0.1,
+      1,
+      10
+    ],
+    "mode": [
+      "exact"
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "kernel": "linear",
+    "trotter_order": 2,
+    "trotter_reps": 1,
+    "n_test": 40,
+    "transpile_seed": 0,
+    "noise": {
+      "p1": 0.001,
+      "p2": 0.01
+    },
+    "quick": false,
+    "noise_enabled": false
+  },
+  "versions": {
+    "numpy": "2.4.1",
+    "scipy": "1.17.0",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.7.2",
+    "qiskit": "2.3.0",
+    "qiskit-aer": "0.17.2",
+    "qiskit-machine-learning": "0.8.2"
+  },
+  "python": "3.12.10",
+  "date": "2026-11-23T18:48:36"
+}

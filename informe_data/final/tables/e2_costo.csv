@@ -1,0 +1,22 @@
+dataset,kernel,modo,n_kernel_evals,t_kernel (s),t_ajuste (s)
+breast_cancer,lineal,--,155 610,0.000,0.112
+breast_cancer,rbf,s=1,155 610,0.010,0.044
+breast_cancer,rbf,s ajustada,778 050,0.028,0.222
+breast_cancer,zzfm,s=1,155 610,1.635,0.150
+breast_cancer,zzfm,s ajustada,778 050,8.336,0.427
+breast_cancer,rot2dof,s=1,155 610,0.973,0.186
+breast_cancer,rot2dof,s ajustada,778 050,5.108,0.365
+banknote,lineal,--,43 320,0.000,0.028
+banknote,rbf,s=1,43 320,0.000,0.026
+banknote,rbf,s ajustada,216 600,0.006,0.125
+banknote,zzfm,s=1,43 320,0.726,0.032
+banknote,zzfm,s ajustada,216 600,3.623,0.142
+banknote,rot2dof,s=1,43 320,0.436,0.032
+banknote,rot2dof,s ajustada,216 600,2.219,0.142
+haberman,lineal,--,45 080,0.000,0.104
+haberman,rbf,s=1,45 080,0.001,0.048
+haberman,rbf,s ajustada,225 400,0.010,0.206
+haberman,zzfm,s=1,45 080,0.524,0.124
+haberman,zzfm,s ajustada,225 400,2.625,0.371
+haberman,rot2dof,s=1,45 080,0.567,0.038
+haberman,rot2dof,s ajustada,225 400,2.824,0.153

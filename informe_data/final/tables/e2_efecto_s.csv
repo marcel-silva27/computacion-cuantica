@@ -1,0 +1,13 @@
+dataset,kernel,Δ media (pp),Δ mediana (pp),mejora/empata/empeora,Wilcoxon p
+breast_cancer,linear,+0.00,+0.00,0/25/0,--
+breast_cancer,rbf,+0.04,+0.00,7/7/11,0.913
+breast_cancer,zzfm,+35.89,+35.98,25/0/0,<0.001
+breast_cancer,rot2dof,+20.05,+20.23,25/0/0,<0.001
+banknote,linear,+0.00,+0.00,0/25/0,--
+banknote,rbf,-0.12,+0.00,0/24/1,0.317
+banknote,zzfm,+40.74,+41.08,25/0/0,<0.001
+banknote,rot2dof,+3.67,+3.03,17/4/4,0.003
+haberman,linear,+0.00,+0.00,0/25/0,--
+haberman,rbf,+0.06,+0.00,12/5/8,0.723
+haberman,zzfm,+5.63,+2.92,19/4/2,<0.001
+haberman,rot2dof,+0.07,+0.00,1/24/0,0.317
