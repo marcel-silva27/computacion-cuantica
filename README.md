@@ -39,7 +39,7 @@ Sin ejecutar o sin verificar:
 - ~~El barrido completo~~ (ejecutado: 144 corridas en 23 min 37 s, ver *Resultados finales*). La corrida
   más pesada (N = 7, `n_c = 6`, `trotter`) tardó ~66 s en una prueba suelta.
 - **N = 15** (16×16): opcional, no probado.
-- **Ruido**: probado en una sola corrida (N = 3, `n_c = 4`).
+- **Ruido**: barrido ejecutado solo para N = 3 en modo `exact` (36 corridas, ver *Resultados finales*); `trotter` con ruido no se ejecutó.
 
 Puntos a tener en cuenta al analizar (hallazgos de la verificación, no conclusiones):
 - La fidelidad depende mucho de `κ` y de `n_c`. Si el peso de la solución está en valores
