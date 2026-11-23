@@ -113,6 +113,8 @@ informe_data/final/
 ├── RESULTADOS.md   # números clave, anomalías y desviaciones (solo hechos)
 ├── e1/             # runs.csv, config.json
 ├── e2/             # runs.csv, config.json, subsample_indices.json (sin kernel_cache)
+├── e1_ext_nc78/    # extensión posterior de E1: n_c ∈ {7, 8}, exact, 36 corridas (no es parte del barrido original)
+├── e1_noise_test/  # una sola corrida de prueba con ruido (N=3, n_c=6, γ=10)
 ├── tables/         # CSV y .tex (solo tabular con \hline, sin caption)
 └── figs/           # fig1..fig4 en PDF y PNG (300 dpi)
 ```

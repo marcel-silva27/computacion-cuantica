@@ -137,6 +137,34 @@ En modo `kakavand`, `best_s = 1` en las 300 filas.
 (778 050 / 216 600 / 225 400). Mediana de `kernel_time_s`: rbf 0.000–0.010 s (s=1) y 0.006–0.028 s (aj.); zzfm 0.52–1.64 s (s=1) y
 2.6–8.3 s (aj.); rot2dof 0.44–0.97 s (s=1) y 2.2–5.1 s (aj.). Estos tiempos son de simulación statevector, no de hardware.
 
+## Extensión de E1 posterior al barrido original (n_c ∈ {7, 8}, solo `exact`; 36 corridas)
+
+**No es parte del barrido original de 144 corridas**, que no se modificó; se agregó después de ver que solo una combinación llegaba a
+fidelidad ≥ 0.9. Misma implementación y configuración del notebook 01 salvo la grilla de `n_c` (7, 8) y `mode` (solo `exact`):
+N ∈ {3, 7} × γ ∈ {0.1, 1, 10} × 3 semillas. 36 filas, 0 fallos, duplicados ni NaN; cómputo total ≈ 90 s.
+Datos: `e1_ext_nc78/`; tablas `e1_ext*`; figura 5 (barrido original + extensión).
+
+**Fidelidad ≥ 0.9: 16 de 36 corridas.** Fidelidad mediana [mín, máx]:
+
+| N | γ | n_c = 7 | n_c = 8 |
+|---|---|---|---|
+| 3 | 0.1 | 0.056 [0.054, 0.081] | 0.578 [0.529, 0.793] |
+| 3 | 1 | 0.9993 [0.9984, 1.0000] | 0.9994 [0.9994, 1.0000] |
+| 3 | 10 | 0.9993 [0.9991, 0.9996] | 0.9999 [0.9994, 1.0000] |
+| 7 | 0.1 | 0.475 [0.432, 0.683] | 0.841 [0.696, 0.884] |
+| 7 | 1 | 0.840 [0.587, 0.925] | 1.0000 [0.9997, 1.0000] |
+| 7 | 10 | 0.0002 [0.0001, 0.0002] | 0.0032 [0.0011, 0.0061] |
+
+- N = 3 con γ = 1 y γ = 10 supera 0.9 en las 3 semillas con n_c = 7 y 8 (12 corridas). N = 7 con γ = 1: 1 de 3 semillas con n_c = 7 y 3 de 3 con n_c = 8 (4 corridas).
+- N = 3 con γ = 0.1 (κ ≈ 274) y N = 7 con γ = 0.1 y γ = 10 no llegan a 0.9 con n_c ≤ 8; N = 7, γ = 10 (κ ≈ 1220) sigue en ≈ 0.
+- Recursos (mediana): N = 3: 10 403 cx / profundidad 24 869 con n_c = 7 y 26 817 cx / 57 969 con n_c = 8 (10 y 11 qubits); N = 7: 10 994 cx / 27 203 y
+  27 492 cx / 60 659 (11 y 12 qubits). Cada qubit de reloj extra multiplica los `cx` por ≈ 2.5 (rotaciones multicontroladas, exponenciales en n_c).
+  Misma advertencia: estos conteos no son evidencia de aceleración.
+
+**Prueba de ruido (una sola corrida, `e1_noise_test/`)**: N = 3, n_c = 6, γ = 10, `exact`, semilla 0, Aer con matriz de densidad y depolarizante
+1q = 0.001 (en `sx`), 2q = 0.01 (en `cx`). Fidelidad 0.993 sin ruido → **0.194 con ruido**; `success_prob` 0.0718 → 0.0078. Tiempo de la corrida: 9.6 s.
+No es un barrido (n = 1); el barrido con ruido de N = 3 completo sigue sin ejecutar.
+
 ## Anomalías y desviaciones respecto de lo esperado
 1. **Rendimiento ≈ azar:** zzfm con `s = 1` en breast_cancer da 49.50 % (balanced accuracy); rot2dof en haberman da exactamente 50.00 % en 25/25
    pliegues con `s = 1` (24/25 con `s` ajustada), es decir predice una sola clase. Lineal en haberman: 19/25 pliegues en 50 % exacto.
@@ -149,5 +177,5 @@ En modo `kakavand`, `best_s = 1` en las 300 filas.
 5. `config.json` de **E1 no incluye commit** (el de E2 sí: `984cec6`, con el árbol de trabajo modificado: notebooks 01 y 02 tenían cambios sin commitear —salidas
    ejecutadas— al momento de correr). E1 no genera `subsample_indices.json`: los índices de entrenamiento van en la columna `train_idx` de `runs.csv`.
 6. E1: la prueba 3 de `CLAUDE.md` se verifica con γ = 10 (ver README); en el barrido completo γ = 10 es la única combinación que supera 0.9, solo para N = 3.
-7. No se ejecutó E1 con ruido (opcional).
+7. E1 con ruido: solo se ejecutó una corrida de prueba (ver arriba), no el barrido de N = 3 (opcional). N = 15 no se ejecutó (opcional).
 8. `qiskit-machine-learning` 0.8.2 sigue sin ser compatible con `qiskit` 2.3: la prueba de equivalencia con `QSVC` se omite (ver README).
